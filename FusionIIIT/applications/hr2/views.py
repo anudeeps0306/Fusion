@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import *
 from applications.globals.models import ExtraInfo
 from applications.globals.models import *
@@ -11,15 +11,16 @@ from django.http import HttpResponse, HttpResponseRedirect
 from applications.establishment.models import *
 from applications.establishment.views import *
 from applications.eis.models import *
-from applications.globals.models import ExtraInfo, HoldsDesignation, DepartmentInfo
+from applications.globals.models import ExtraInfo, HoldsDesignation, DepartmentInfo, Designation
 from html import escape
 from io import BytesIO
 import re
-
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import (get_object_or_404, redirect, render,
                               render)
+from django.http import JsonResponse
+from applications.filetracking.sdk.methods import *
 
 
 def edit_employee_details(request, id):
@@ -374,3 +375,236 @@ def add_new_user(request):
                }
 
     return render(request, template, context)
+
+def ltc_form(request, id):
+    """ Views for edit details"""
+    try:
+        employee = ExtraInfo.objects.get(user__id=id)
+    except:
+        raise Http404("Post does not exist! id doesnt exist")
+
+    print(employee.user_type)
+
+    
+    if(employee.user_type == 'faculty'):
+        template = 'hr2Module/ltc_form.html'
+
+        if request.method == "POST":
+            family_mem_a = request.POST.get('id_family_mem_a', '')
+            family_mem_b = request.POST.get('id_family_mem_b', '')
+            family_mem_c = request.POST.get('id_family_mem_c', '')
+
+        
+            details_of_family_members = ', '.join(filter(None, [family_mem_a, family_mem_b, family_mem_c]))
+
+        
+            request.POST = request.POST.copy()
+            request.POST['details_of_family_members_already_done'] = details_of_family_members
+
+    
+            family_members = []
+            for i in range(1, 7):  # Loop through input fields for each family member
+                name = request.POST.get(f'info_{i}_2', '')  # Get the name
+                age = request.POST.get(f'info_{i}_3', '')   # Get the age
+                if name and age:  # Check if both name and age are provided
+                    family_members.append(f"{name} ({age} years)")  # Concatenate name and age
+
+            family_members_str = ', '.join(family_members)
+
+            # Populate the form with concatenated family member details
+            request.POST['family_members_about_to_avail'] = family_members_str
+
+            dependents = []
+            for i in range(1, 7):  # Loop through input fields for each dependent
+                name = request.POST.get(f'd_info_{i}_2', '')  # Get the name
+                age = request.POST.get(f'd_info_{i}_3', '')   # Get the age
+                why_dependent = request.POST.get(f'd_info_{i}_4', '')  # Get the reason for dependency
+                if name and age:  # Check if both name and age are provided
+                    dependents.append(f"{name} ({age} years), {why_dependent}")  # Concatenate name, age, and reason
+            
+
+            # Concatenate all dependent strings into a single string
+            dependents_str = ', '.join(dependents)
+
+            # Populate the form with concatenated dependent details
+            request.POST['details_of_dependents'] = dependents_str
+
+            # print("first",request.POST['family_members_about_to_avail'])
+            pf_no = int(request.POST.get('pf_no')) if request.POST.get('pf_no') else None
+            basic_pay_salary = int(request.POST.get('basic_pay_salary')) if request.POST.get('basic_pay_salary') else None
+            amount_of_advance_required = int(request.POST.get('amount_of_advance_required')) if request.POST.get('amount_of_advance_required') else None
+            phone_number_for_contact = int(request.POST.get('phone_number_for_contact')) if request.POST.get('phone_number_for_contact') else None
+
+
+            try:
+                ltc_request = LTCform.objects.create(
+                    employee_id = id,
+                    details_of_family_members_already_done=request.POST.get('details_of_family_members_already_done', ''),
+                    family_members_about_to_avail=request.POST.get('family_members_about_to_avail', ''),
+                    details_of_dependents=request.POST.get('details_of_dependents', ''),
+                    name=request.POST.get('name', ''),
+                    block_year=request.POST.get('block_year', ''),
+                    pf_no=request.POST.get('pf_no', ''),
+                    basic_pay_salary=request.POST.get('basic_pay_salary', ''),
+                    designation=request.POST.get('designation', ''),
+                    department_info=request.POST.get('department_info', ''),
+                    leave_availability=request.POST.get('leave_availability', ''),
+                    leave_start_date=request.POST.get('leave_start_date', ''),
+                    leave_end_date=request.POST.get('leave_end_date', ''),
+                    date_of_leave_for_family=request.POST.get('date_of_leave_for_family', ''),
+                    nature_of_leave=request.POST.get('nature_of_leave', ''),
+                    purpose_of_leave=request.POST.get('purpose_of_leave', ''),
+                    hometown_or_not=request.POST.get('hometown_or_not', ''),
+                    place_of_visit=request.POST.get('place_of_visit', ''),
+                    address_during_leave=request.POST.get('address_during_leave', ''),
+                    mode_for_vacation=request.POST.get('mode_for_vacation', ''),
+                    details_of_family_members=request.POST.get('details_of_family_members', ''),
+                    amount_of_advance_required=request.POST.get('amount_of_advance_required', ''),
+                    certified_family_dependents=request.POST.get('certified_family_dependents', ''),
+                    certified_advance=request.POST.get('certified_advance', ''),
+                    adjusted_month=request.POST.get('adjusted_month', ''),
+                    date=request.POST.get('date', ''),
+                    phone_number_for_contact=request.POST.get('phone_number_for_contact', '')
+                )
+                print("done")
+                messages.success(request, "Ltc form filled successfully")
+            except Exception as e:
+                print("error" , e)
+                messages.warning(request, "Fill not correctly")
+                context = {'employee': employee}
+                return render(request, template, context)
+
+            
+         # Query all LTC requests
+        ltc_requests = LTCform.objects.filter(employee_id=id)
+
+        context = {'employee': employee, 'ltc_requests': ltc_requests}
+
+        return render(request, template, context)
+    else:
+        return render(request, 'hr2Module/edit.html')
+
+def view_ltc_form(request, id):
+    ltc_form = get_object_or_404(LTCform, id=id)
+
+    # Preprocessing data
+    family_mem_a = ltc_form.family_members_about_to_avail.split(',')[0].strip() if ltc_form.family_members_about_to_avail else ''
+    family_mem_b = ltc_form.family_members_about_to_avail.split(',')[1].strip() if ltc_form.family_members_about_to_avail else ''
+    family_mem_c = ltc_form.family_members_about_to_avail.split(',')[2].strip() if ltc_form.family_members_about_to_avail else ''
+    ltc_form.details_of_family_members_already_done = ', '.join(filter(None, [family_mem_a, family_mem_b, family_mem_c]))
+
+    family_members = []
+    for i in range(1, 7):  
+        name = getattr(ltc_form, f'info_{i}_2', '')  
+        age = getattr(ltc_form, f'info_{i}_3', '')   
+        if name and age:
+            family_members.append(f"{name} ({age} years)")
+    ltc_form.family_members_about_to_avail = ', '.join(family_members)
+
+    dependents = []
+    for i in range(1, 7): 
+        name = getattr(ltc_form, f'd_info_{i}_2', '')  
+        age = getattr(ltc_form, f'd_info_{i}_3', '')   
+        why_dependent = getattr(ltc_form, f'd_info_{i}_4', '')  
+        if name and age:
+            dependents.append(f"{name} ({age} years), {why_dependent}")
+    ltc_form.details_of_dependents = ', '.join(dependents)
+
+    context = {
+        'ltc_form': ltc_form
+    }
+    print(ltc_form.block_year)
+
+    return render(request, 'hr2Module/view_ltc_form.html', context)
+
+def get_user_object_from_username(username: str) -> User:
+    user = User.objects.get(username=username)
+    return user
+
+def get_designation_name(username):
+    try:
+        # Get the user object
+        user = User.objects.get(username=username)
+
+        print("User" , user)
+        
+        # Get the HoldsDesignation object associated with the user
+        holds_designation = HoldsDesignation.objects.get(user=user)\
+
+        print("Hole De", holds_designation)
+        
+        # Retrieve the designation name
+        designation_name = holds_designation.designation.name
+        
+        return designation_name
+    except User.DoesNotExist:
+        return "User does not exist"
+    except HoldsDesignation.DoesNotExist:
+        return "Designation not found for user"
+
+def forward_request(request, id):
+    try:
+        # Retrieve the LTC form object
+        ltc_form = get_object_or_404(LTCform, id=id)
+
+        # print(get_user_object_from_username("atul"))
+
+        getting_d = get_designation_name("21BCS185")
+
+        # print("2",getting_d)
+
+        # Logic to handle the LTC form and prepare necessary data
+        # For example:
+        uploader = "21BCS183" # Assuming this is the username of the uploader
+        uploader_designation = "student" # Assuming the uploader is a student
+        receiver = "vkjain"  # Assuming this is the username of the HR admin
+        receiver_designation = "CSE HOD"  # Assuming this is the designation of HR admin
+        src_module = "hr2"  # Assuming the source module is the LTC module
+        src_object_id = str(ltc_form.id)  # Assuming the LTC form object ID is used as src_object_id
+        file_extra_JSON = {"key": "value"}  # Any additional data related to the file
+
+        # Create a file representing the LTC form and send it to HR admin
+        file_id = create_file(
+            uploader=uploader,
+            uploader_designation=uploader_designation,
+            receiver=receiver,
+            receiver_designation=receiver_designation,
+            src_module=src_module,
+            src_object_id=src_object_id,
+            file_extra_JSON=file_extra_JSON,
+            attached_file=None  # Attach any file if necessary
+        )
+
+        # file_id = create_file(uploader="21BCS078", 
+        #     uploader_designation="student", 
+        #     receiver="Shyam",
+        #     receiver_designation="h1caretaker", 
+        #     src_module="complaint", 
+        #     src_object_id= src_object_id, 
+        #     file_extra_JSON= {"value": 2}, 
+        #     attached_file = None)
+
+        # print("new1")
+
+
+        # Add success message
+        messages.success(request, "LTC form forwarded successfully")
+        print(view_inbox(
+            username="vkjain",
+            designation="CSE HOD",
+            src_module="hr2"
+        ))
+        # Return a success response
+        # console.log("file_id", file_id)
+        response_data = {'message': 'LTC form forwarded successfully', 'file_id': file_id}
+        return JsonResponse(response_data)
+    except Exception as e:
+        # Log error
+        print("Error:", e)
+        
+        # Add warning message
+        messages.warning(request, "LTC form forwarding failed")
+
+        # Return an error response if any exception occurs
+        response_data = {'error': str(e)}
+        return JsonResponse(response_data, status=500)

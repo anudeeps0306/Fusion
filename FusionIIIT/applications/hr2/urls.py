@@ -17,5 +17,12 @@ urlpatterns = [
     url(r'^administrativeProfile/$', views.administrative_profile,
         name='administrativeProfile'),
     url(r'^addnew/$', views.add_new_user, name='addnew'),
+    url(r'^ltc_form/(?P<id>\d+)/$', views.ltc_form,
+        name='ltcForm'),
+    url(r'^view_ltc_form/(?P<id>\d+)/$', views.view_ltc_form,
+        name='view_ltc_form'),
+    url(r'^forward/(?P<id>\d+)/$', views.forward_request,
+        name='forward_request'),
+    
 
 ]
