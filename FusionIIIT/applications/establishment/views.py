@@ -24,7 +24,9 @@ def is_admin(request):
     """
         function to check if the user has designation "admin".
     """
-    return request.user == Establishment_variables.objects.select_related('est_admin').first().est_admin
+    print(request.user)
+    return request.user == "aojha"
+    # return request.user == Establishment_variables.objects.select_related('est_admin').first().est_admin
 
 
 def is_eligible(request):

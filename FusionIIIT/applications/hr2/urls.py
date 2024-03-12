@@ -19,10 +19,12 @@ urlpatterns = [
     url(r'^addnew/$', views.add_new_user, name='addnew'),
     url(r'^ltc_form/(?P<id>\d+)/$', views.ltc_form,
         name='ltcForm'),
+    url(r'^cpda_form/(?P<id>\d+)/$', views.ltc_form,
+        name='ltcForm'),
     url(r'^view_ltc_form/(?P<id>\d+)/$', views.view_ltc_form,
         name='view_ltc_form'),
-    url(r'^forward/(?P<id>\d+)/$', views.forward_request,
-        name='forward_request'),
-    
-
+    url(r'^form_mangement_ltc/',views.form_mangement_ltc, name='form_mangement_ltc'),
+    url(r'dashboard/', views.dashboard, name='dashboard'),
+    url(r'^form_mangement_ltc_hr/(?P<id>\d+)/$',views.form_mangement_ltc_hr, name='form_mangement_ltc_hr'),
+     url(r'^form_mangement_ltc_hod/',views.form_mangement_ltc_hod, name='form_mangement_ltc_hod'),
 ]
