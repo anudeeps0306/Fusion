@@ -36,12 +36,16 @@ class LTC(APIView):
     
     def put(self, request, *args, **kwargs):
         pk = request.query_params.get("id")
-        print(pk)
+        send_to = request.query_params.get("send_to")
+        receiver_value = User.objects.get(username=send_to)
+        receiver_value_designation= HoldsDesignation.objects.filter(user=receiver_value)
+        lis = list(receiver_value_designation)
+        obj=lis[0].designation
         form = LTCform.objects.get(id = pk)
-        print(form)
         serializer = self.serializer_class(form, data = request.data)
         if serializer.is_valid():
             serializer.save()
+            forward_file(file_id = id, receiver = send_to, receiver_designation = obj.name, remarks = request.data['remarks'], file_extra_JSON = request.data['file_extra_JSON'])
             return Response(serializer.data, status = status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
@@ -79,7 +83,6 @@ class CPDAAdvance(APIView):
 
     def get(self, request, *args, **kwargs):
         pk = request.query_params.get("name")
-        print(pk)
         try: 
             forms = CPDAAdvanceform.objects.get(name =  pk)           
             serializer = self.serializer_class(forms, many = False)
@@ -90,11 +93,15 @@ class CPDAAdvance(APIView):
     
     def put(self, request, *args, **kwargs):
         pk = request.query_params.get("id")
-        print(pk)
         form = CPDAAdvanceform.objects.get(id = pk)
-        print(form)
+        send_to = request.query_params.get("send_to")
+        receiver_value = User.objects.get(username=send_to)
+        receiver_value_designation= HoldsDesignation.objects.filter(user=receiver_value)
+        lis = list(receiver_value_designation)
+        obj=lis[0].designation
         serializer = self.serializer_class(form, data = request.data)
         if serializer.is_valid():
+            forward_file(file_id = id, receiver = send_to, receiver_designation = obj.name, remarks = request.data['remarks'], file_extra_JSON = request.data['file_extra_JSON'])
             serializer.save()
             return Response(serializer.data, status = status.HTTP_200_OK)
         else:
@@ -126,11 +133,15 @@ class CPDAReimbursement(APIView):
     
     def put(self, request, *args, **kwargs):
         pk = request.query_params.get("id")
-        print(pk)
         form = CPDAReimbursementform.objects.get(id = pk)
-        print(form)
+        send_to = request.query_params.get("send_to")
+        receiver_value = User.objects.get(username=send_to)
+        receiver_value_designation= HoldsDesignation.objects.filter(user=receiver_value)
+        lis = list(receiver_value_designation)
+        obj=lis[0].designation
         serializer = self.serializer_class(form, data = request.data)
         if serializer.is_valid():
+            forward_file(file_id = id, receiver = send_to, receiver_designation = obj.name, remarks = request.data['remarks'], file_extra_JSON = request.data['file_extra_JSON'])
             serializer.save()
             return Response(serializer.data, status = status.HTTP_200_OK)
         else:
@@ -151,7 +162,6 @@ class Leave(APIView):
 
     def get(self, request, *args, **kwargs):
         pk = request.query_params.get("name")
-        print(pk)
         try: 
             forms = Leaveform.objects.get(name =  pk)           
             serializer = self.serializer_class(forms, many = False)
@@ -162,12 +172,16 @@ class Leave(APIView):
     
     def put(self, request, *args, **kwargs):
         pk = request.query_params.get("id")
-        print(pk)
         form = Leaveform.objects.get(id = pk)
-        print(form)
+        send_to = request.query_params.get("send_to")
+        receiver_value = User.objects.get(username=send_to)
+        receiver_value_designation= HoldsDesignation.objects.filter(user=receiver_value)
+        lis = list(receiver_value_designation)
+        obj=lis[0].designation
         serializer = self.serializer_class(form, data = request.data)
         if serializer.is_valid():
             serializer.save()
+            forward_file(file_id = id, receiver = send_to, receiver_designation = obj.name, remarks = request.data['remarks'], file_extra_JSON = request.data['file_extra_JSON'])
             return Response(serializer.data, status = status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
@@ -198,17 +212,28 @@ class Appraisal(APIView):
     
     def put(self, request, *args, **kwargs):
         pk = request.query_params.get("id")
-        print(pk)
         form = Appraisalform.objects.get(id = pk)
-        print(form)
+        send_to = request.query_params.get("send_to")
+        receiver_value = User.objects.get(username=send_to)
+        receiver_value_designation= HoldsDesignation.objects.filter(user=receiver_value)
+        lis = list(receiver_value_designation)
+        obj=lis[0].designation
         serializer = self.serializer_class(form, data = request.data)
         if serializer.is_valid():
             serializer.save()
+            forward_file(file_id = id, receiver = send_to, receiver_designation = obj.name, remarks = request.data['remarks'], file_extra_JSON = request.data['file_extra_JSON'])
             return Response(serializer.data, status = status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
         
-class AssignerReviewer(APIView):
-    def post(self, request, *args, **kwargs):
-        forward_file(file_id = request.data['file_id'], receiver = "21BCS140", receiver_designation = 'hradmin', remarks = request.data['remarks'], file_extra_JSON = request.data['file_extra_JSON'])
-        return Response(status = status.HTTP_200_OK)
+# class Forward(APIView):
+#     def post(self, request, *args, **kwargs):
+#         forward_file(file_id = request.data['file_id'], receiver = request.data['receiver'], receiver_designation = 'hradmin', remarks = request.data['remarks'], file_extra_JSON = request.data['file_extra_JSON'])
+#         return Response(status = status.HTTP_200_OK)
+
+class GetForms:
+    permission_classes = (AllowAny, )
+    def get(self, request, *args, **kwargs):
+        forms = LTCform.objects.all()
+        serializer = LTC_serializer(forms, many = True)
+        return Response(serializer.data, status = status.HTTP_200_OK)
