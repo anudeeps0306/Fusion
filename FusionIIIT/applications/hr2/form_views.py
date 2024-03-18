@@ -83,13 +83,18 @@ class CPDAAdvance(APIView):
     permission_classes = (AllowAny, )
     def post(self, request):
         user_info = request.data[0]
+        receiver_value = User.objects.get(username=user_info['receiver_name'])
+        receiver_value_designation= HoldsDesignation.objects.filter(user=receiver_value)
+        lis = list(receiver_value_designation)
+        obj=lis[0].designation
         serializer = self.serializer_class(data = request.data[1])
         if serializer.is_valid():
             serializer.save()
-            file_id = create_file(uploader = user_info['uploader_name'], uploader_designation = user_info['uploader_designation'], rreceiver = user_info['receiver_name'], receiver_designation=user_info['receiver_designation'],  src_module="HR", src_object_id= str(serializer.data['id']), file_extra_JSON= {"type": "CPDAAdvance"}, attached_file= None)
+            file_id = create_file(uploader = user_info['uploader_name'], uploader_designation = user_info['uploader_designation'], receiver = user_info['receiver_name'], receiver_designation=obj.name, src_module="HR", src_object_id= str(serializer.data['id']), file_extra_JSON= {"type": "LTC"}, attached_file= None)
             return Response(serializer.data, status= status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
+
 
     def get(self, request, *args, **kwargs):
         pk = request.query_params.get("name")
@@ -128,13 +133,18 @@ class CPDAReimbursement(APIView):
     permission_classes = (AllowAny, )
     def post(self, request):
         user_info = request.data[0]
+        receiver_value = User.objects.get(username=user_info['receiver_name'])
+        receiver_value_designation= HoldsDesignation.objects.filter(user=receiver_value)
+        lis = list(receiver_value_designation)
+        obj=lis[0].designation
         serializer = self.serializer_class(data = request.data[1])
         if serializer.is_valid():
             serializer.save()
-            file_id = create_file(uploader = user_info['uploader_name'], uploader_designation = user_info['uploader_designation'], rreceiver = user_info['receiver_name'], receiver_designation=user_info['receiver_designation'],  src_module="HR", src_object_id= str(serializer.data['id']), file_extra_JSON= {"type": "CPDAReimbursement"}, attached_file= None)
+            file_id = create_file(uploader = user_info['uploader_name'], uploader_designation = user_info['uploader_designation'], receiver = user_info['receiver_name'], receiver_designation=obj.name, src_module="HR", src_object_id= str(serializer.data['id']), file_extra_JSON= {"type": "LTC"}, attached_file= None)
             return Response(serializer.data, status= status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
+
 
     def get(self, request, *args, **kwargs):
         pk = request.query_params.get("name")
@@ -174,13 +184,18 @@ class Leave(APIView):
     permission_classes = (AllowAny, )
     def post(self, request):
         user_info = request.data[0]
+        receiver_value = User.objects.get(username=user_info['receiver_name'])
+        receiver_value_designation= HoldsDesignation.objects.filter(user=receiver_value)
+        lis = list(receiver_value_designation)
+        obj=lis[0].designation
         serializer = self.serializer_class(data = request.data[1])
         if serializer.is_valid():
             serializer.save()
-            file_id = create_file(uploader = user_info['uploader_name'], uploader_designation = user_info['uploader_designation'], receiver = user_info['receiver_name'], receiver_designation=user_info['receiver_designation'], src_module="HR2", src_object_id= str(serializer.data['id']), file_extra_JSON= {"type": "Leave"}, attached_file= None)
+            file_id = create_file(uploader = user_info['uploader_name'], uploader_designation = user_info['uploader_designation'], receiver = user_info['receiver_name'], receiver_designation=obj.name, src_module="HR", src_object_id= str(serializer.data['id']), file_extra_JSON= {"type": "LTC"}, attached_file= None)
             return Response(serializer.data, status= status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
+
 
     def get(self, request, *args, **kwargs):
         pk = request.query_params.get("name")
