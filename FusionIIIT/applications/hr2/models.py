@@ -174,7 +174,8 @@ class LTCform(models.Model):
     phoneNumberForContact = models.IntegerField(max_length=10)
     approved = models.BooleanField(null = True)
     approvedDate = models.DateField(auto_now_add=True, null = True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='LTC_created_by')
+    approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='LTC_approved_by')
 
 class CPDAAdvanceform(models.Model):
     id = models.AutoField(primary_key=True)
@@ -191,7 +192,8 @@ class CPDAAdvanceform(models.Model):
     submissionDate = models.DateField()
     approved = models.BooleanField(null = True)
     approvedDate = models.DateField(auto_now_add=True, null = True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='CPDA_created_by')
+    approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='CPDA_approved_by')
 
 class CPDAReimbursementform(models.Model):
     id = models.AutoField(primary_key=True)
@@ -208,7 +210,8 @@ class CPDAReimbursementform(models.Model):
     submissionDate = models.DateField(auto_now_add=True)
     approved = models.BooleanField(null = True)
     approvedDate = models.DateField(auto_now_add=True, null = True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='CPDAR_created_by')
+    approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='CPDAR_approved_by')
 
 class Appraisalform(models.Model):
     id = models.AutoField(primary_key=True)
@@ -223,7 +226,8 @@ class Appraisalform(models.Model):
     submissionDate = models.DateField()
     approved = models.BooleanField(null = True)
     approvedDate = models.DateField(auto_now_add=True, null = True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='Appraisal_created_by')
+    approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='Appraisal_approved_by')
 
 class Leaveform(models.Model):
     id = models.AutoField(primary_key=True)
@@ -240,13 +244,13 @@ class Leaveform(models.Model):
     submissionDate= models.DateField()
     approved = models.BooleanField(null = True)
     approvedDate = models.DateField(auto_now_add=True, null = True)    
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='Leave_created_by')
+    approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True, related_name='Leave_approved_by')
 
-# class LeaveBalance(models.Model):
-#     employee_id = models.OneToOneField(ExtraInfo, on_delete=models.CASCADE)
-#     casual_leave = models.IntegerField(default=0)
-#     medical_leave = models.IntegerField(default=0)
-#     earned_leave = models.IntegerField(default=0)
-#     half_pay_leave = models.IntegerField(default=0)
-#     commuted_leave = models.IntegerField(default=0)
-#     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
+class LeaveBalance(models.Model):
+    employee_id = models.OneToOneField(ExtraInfo, on_delete=models.CASCADE)
+    cl_leave = models.IntegerField(default=0)
+    hcl_leave = models.IntegerField(default=0)
+    el_leave = models.IntegerField(default=0)
+    vacation_leave = models.IntegerField(default=0)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
