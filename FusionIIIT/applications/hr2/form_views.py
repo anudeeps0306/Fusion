@@ -29,7 +29,6 @@ class LTC(APIView):
 
     def get(self, request, *args, **kwargs):
         pk = request.query_params.get("name")
-        print(pk)
         try: 
             forms = LTCform.objects.get(created_by =  pk)           
             serializer = self.serializer_class(forms, many = False)
@@ -148,7 +147,6 @@ class CPDAReimbursement(APIView):
 
     def get(self, request, *args, **kwargs):
         pk = request.query_params.get("name")
-        print(pk)
         try: 
             forms = CPDAReimbursementform.objects.get(created_by =  pk)           
             serializer = self.serializer_class(forms, many = False)
@@ -249,7 +247,6 @@ class Appraisal(APIView):
 
     def get(self, request, *args, **kwargs):
         pk = request.query_params.get("name")
-        print(pk)
         try: 
             forms = Appraisalform.objects.get(created_by =  pk)           
             serializer = self.serializer_class(forms, many = False)
@@ -326,10 +323,9 @@ class GetForms(APIView):
                 serializer = Leave_serializer(forms, many = True)
         return Response(serializer.data, status = status.HTTP_200_OK)
     
-# class TrackProgress(APIView):
-#     permission_classes = (AllowAny, )
-#     def get(self, request, *args, **kwargs):
-#         file_id = request.query_params.get("id")
-#         progress = view_history(file_id)
-#         print(progress)
-#         return Response(status = status.HTTP_200_OK)
+class TrackProgress(APIView):
+    permission_classes = (AllowAny, )
+    def get(self, request, *args, **kwargs):
+        file_id = request.query_params.get("id")
+        progress = view_history(file_id)
+        return Response({"status":progress},status = status.HTTP_200_OK)
