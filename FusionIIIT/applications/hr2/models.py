@@ -1,6 +1,7 @@
 from django.db import models
 from applications.globals.models import ExtraInfo
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import User
 
 class Constants:
     # Class for various choices on the enumerations
@@ -172,7 +173,8 @@ class LTCform(models.Model):
     date= models.DateField(max_length=6)
     phoneNumberForContact = models.IntegerField(max_length=10)
     approved = models.BooleanField(null = True)
-    # approvedDate = models.DateField(auto_now_add=True)
+    approvedDate = models.DateField(auto_now_add=True, null = True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
 
 class CPDAAdvanceform(models.Model):
     id = models.AutoField(primary_key=True)
@@ -188,7 +190,8 @@ class CPDAAdvanceform(models.Model):
     amountCheckedInPDA = models.DecimalField(max_digits=10, decimal_places=2, null = True, blank = True)
     submissionDate = models.DateField()
     approved = models.BooleanField(null = True)
-    # approvedDate = models.DateField(auto_now_add=True)
+    approvedDate = models.DateField(auto_now_add=True, null = True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
 
 class CPDAReimbursementform(models.Model):
     id = models.AutoField(primary_key=True)
@@ -204,7 +207,8 @@ class CPDAReimbursementform(models.Model):
     amountCheckedInPDA = models.DecimalField(max_digits=10, decimal_places=2, null = True, blank = True)
     submissionDate = models.DateField(auto_now_add=True)
     approved = models.BooleanField(null = True)
-    # approvedDate = models.DateField(auto_now_add=True)
+    approvedDate = models.DateField(auto_now_add=True, null = True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
 
 class Appraisalform(models.Model):
     id = models.AutoField(primary_key=True)
@@ -218,7 +222,8 @@ class Appraisalform(models.Model):
     performanceComments = models.TextField()
     submissionDate = models.DateField()
     approved = models.BooleanField(null = True)
-    # approvedDate = models.DateField(auto_now_add=True)
+    approvedDate = models.DateField(auto_now_add=True, null = True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
 
 class Leaveform(models.Model):
     id = models.AutoField(primary_key=True)
@@ -234,4 +239,14 @@ class Leaveform(models.Model):
     rolesTransferredTo = models.TextField() #academic and administrtative responsibilities assigned to
     submissionDate= models.DateField()
     approved = models.BooleanField(null = True)
-    # approvedDate = models.DateField(auto_now_add=True)    
+    approvedDate = models.DateField(auto_now_add=True, null = True)    
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
+
+# class LeaveBalance(models.Model):
+#     employee_id = models.OneToOneField(ExtraInfo, on_delete=models.CASCADE)
+#     casual_leave = models.IntegerField(default=0)
+#     medical_leave = models.IntegerField(default=0)
+#     earned_leave = models.IntegerField(default=0)
+#     half_pay_leave = models.IntegerField(default=0)
+#     commuted_leave = models.IntegerField(default=0)
+#     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
