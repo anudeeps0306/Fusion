@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, get_object_or_404
 from .models import *
 from applications.globals.models import ExtraInfo
@@ -21,6 +22,7 @@ from django.shortcuts import (get_object_or_404, redirect, render,
                               render)
 from django.http import JsonResponse
 from applications.filetracking.sdk.methods import *
+from django.core.files.base import File as DjangoFile
 
 
 def edit_employee_details(request, id):
@@ -712,6 +714,43 @@ def reverse_ltc_pre_processing(data):
 
     return reversed_data
 
+def get_designation_by_user_id(user_id):
+    try:
+        
+        # Query HoldsDesignation model to get the user's designation
+        designation_obj = HoldsDesignation.objects.get(user=user_id)
+        
+        # Access the designation field in the HoldsDesignation object
+        designation = designation_obj.designation
+        
+        return designation
+    except ExtraInfo.DoesNotExist:
+        return None
+    except HoldsDesignation.DoesNotExist:
+        return None
+
+def search_employee(request):
+    search_text = request.GET.get('search', '')
+    data = {'designation': 'Assistant Professor'}
+    try:
+        # employee = ExtraInfo.objects.filter(user__username__icontains=search_text)
+
+        employee = User.objects.get(username = search_text)
+  
+        print(employee)
+    
+        holds_designation = HoldsDesignation.objects.filter(user=employee)
+        holds_designation = list(holds_designation)
+
+        print(holds_designation[0].designation)
+
+        
+        data['designation'] = str(holds_designation[0].designation)
+    except ExtraInfo.DoesNotExist:
+        data = {'error': "Employee doesn't exist"}
+
+    return JsonResponse(data)
+
 def ltc_form(request, id):
     """ Views for edit details"""
     try:
@@ -722,7 +761,7 @@ def ltc_form(request, id):
     print(employee.user_type)
 
     
-    if(employee.user_type == 'faculty'):
+    if(employee.user_type == 'faculty' or employee.user_type == 'staff' or employee.user_type == 'student'):
         template = 'hr2Module/ltc_form.html'
 
         if request.method == "POST":
@@ -730,11 +769,11 @@ def ltc_form(request, id):
                 print("Creating ltc object!")
 
                 data = ltc_pre_processing(request)
-                print(request.POST.getlist('details_of_family_members_already_done'))
-                print(request.POST.get('d1'))
+                # print(request.POST.getlist('details_of_family_members_already_done'))
+                # print(request.POST.get('d1'))
 
-                print(request.POST)
-                print(data)
+                # print(request.POST)
+                # print(data)
 
                 form_1 = {
                     'employee_id': id,
@@ -742,6 +781,7 @@ def ltc_form(request, id):
                     'block_year': request.POST.get('block_year'),
                     'basic_pay_salary': request.POST.get('basic_pay_salary'),
                     'designation': request.POST.get('designation'),
+                    'pf_no': request.POST.get('pf_no'),
                     'department_info': request.POST.get('department_info'),
                     'leave_availability': request.POST.get('leave_availability'),
                     'leave_start_date': request.POST.get('leave_start_date'),
@@ -760,10 +800,21 @@ def ltc_form(request, id):
                     'certified_advance': request.POST.get('certified_advance'),
                     'adjusted_month': request.POST.get('adjusted_month'),
                     'date': request.POST.get('date'),
-                    'phone_number_for_contact': request.POST.get('phone_number_for_contact')
+                    'phone_number_for_contact': request.POST.get('phone_number_for_contact'),
+                    'username_employee' : request.POST.get('username_employee'),
+                    'designation_employee' : request.POST.get('designation_employee')
                 }
 
-                print(form_1)
+                # attached_file = None
+
+                # print(request.FILES.get('file_attachment'))
+
+                # if(request.FILES.get('file_attachment') != ""):
+                #     attached_file = open(request.FILES.get('file_attachment'), "rb")
+                #     attached_file = DjangoFile(attached_file)
+                
+
+                # print(attached_file)
 
 
 
@@ -773,6 +824,7 @@ def ltc_form(request, id):
                     employee_id=id,
                     name=request.POST.get('name'),
                     block_year = request.POST.get('block_year'),
+                    pf_no = request.POST.get('pf_no'),
                     basic_pay_salary=request.POST.get('basic_pay_salary'),
                     designation=request.POST.get('designation'),
                     department_info=request.POST.get('department_info'),
@@ -798,30 +850,41 @@ def ltc_form(request, id):
 
                 print("Created Ltc Object!")
 
+                uploader = employee.user
+                uploader_designation = 'Assistant Professor'
 
-                # uploader = "21BCS183"
-                # uploader_designation = "student"
-                # receiver = "21BCS185"
-                # receiver_designation = "hradmin"
-                # src_module = "HR"
-                # src_object_id = str(ltc_form.id)
-                # file_extra_JSON = {"key": "value"}
+                get_designation = get_designation_by_user_id(employee.user)
+                if(get_designation):
+                    uploader_designation = get_designation
 
-                # # Create a file representing the LTC form and send it to HR admin
-                # file_id = create_file(
-                #     uploader=uploader,
-                #     uploader_designation=uploader_designation,
-                #     receiver=receiver,
-                #     receiver_designation=receiver_designation,
-                #     src_module=src_module,
-                #     src_object_id=src_object_id,
-                #     file_extra_JSON=file_extra_JSON,
-                #     attached_file=None  # Attach any file if necessary
-                # )
+                receiver = request.POST.get('username_employee')
+                receiver_designation = request.POST.get('designation_employee')
+                src_module = "HR"
+                src_object_id = str(ltc_form.id)
+                file_extra_JSON = {"key": "value"}
 
-                # print("Sent the file to Hradmin!")
+                print("uploader",uploader)
+                print("uploader_designation",uploader_designation)
+                print("receiver",receiver)
+                print("receiver_designation",receiver_designation)
 
-                # messages.success(request, "Ltc form filled successfully")
+                # Create a file representing the LTC form and send it to HR admin
+                file_id = create_file(
+                    uploader=uploader,
+                    uploader_designation=uploader_designation,
+                    receiver=receiver,
+                    receiver_designation=receiver_designation,
+                    src_module=src_module,
+                    src_object_id=src_object_id,
+                    file_extra_JSON=file_extra_JSON,
+                    attached_file=None  # Attach any file if necessary
+                )
+
+                print("Sent the file to Hradmin!")
+
+                messages.success(request, "Ltc form filled successfully")
+
+                return redirect(request.path_info)
 
             except Exception as e:
                 print("error" , e)
@@ -834,11 +897,99 @@ def ltc_form(request, id):
          # Query all LTC requests
         ltc_requests = LTCform.objects.filter(employee_id=id)
 
-        context = {'employee': employee, 'ltc_requests': ltc_requests}
+        username = employee.user
+        uploader_designation = 'Assistant Professor'
 
+        designation = get_designation_by_user_id(employee.user)
+        if(designation):
+            uploader_designation = designation
+
+        print("username",username)
+        print("uploader_designation",uploader_designation)
+        
+        inbox = view_inbox(username = username, designation = uploader_designation, src_module = "HR")
+
+        print(inbox)
+
+        context = {'employee': employee, 'ltc_requests': ltc_requests, 'inbox': inbox}
+
+        messages.success(request, "Ltc form filled successfully!")
         return render(request, template, context)
     else:
         return render(request, 'hr2Module/edit.html')
+    
+def form_view_ltc(request , id):
+    ltc_request = get_object_or_404(LTCform, id=id)
+
+    from_user = request.GET.get('param1')
+    from_designation = request.GET.get('param2')
+    file_id = request.GET.get('param3')
+
+    print(file_id)
+    print(from_user)
+    print(from_designation)
+
+
+
+    template = 'hr2Module/view_ltc_form.html'
+    print(ltc_request)
+    ltc_request = reverse_ltc_pre_processing(ltc_request)
+    print(ltc_request)
+    
+    context = {'ltc_request' : ltc_request , "button" : 1 , "file_id" : file_id, "from_user" :from_user , "from_designation" : from_designation}
+
+    return render(request , template , context)
+
+def track_file(request, id):
+    # Assuming file_history is a list of dictionaries
+    template = 'hr2Module/ltc_form_trackfile.html'
+    file_history = view_history(file_id=id)
+
+
+    print(file_history)
+
+    print(file_history[0]['current_id'])
+
+    context = {'file_history': file_history}
+
+    # Create a JSON response
+    return render(request ,template , context)
+
+def file_handle(request):
+    if request.method == 'POST':
+        form_data = request.POST
+        action = form_data.get('action')
+        username_employee = form_data.get('username_employee')
+        designation_employee = form_data.get('designation_employee')
+
+    
+
+        file_id = form_data.get('file_id')
+        from_user = form_data.get('from_user')
+        from_designation = form_data.get('from_designation')
+
+        print("file_id",file_id)
+        print("from_user",from_user)
+        print("from_designation",from_designation)
+        print("action",action)
+        print("username_employee",username_employee)
+        print("designation_employee",designation_employee)
+
+
+        if(action == '0'):
+            track_id = forward_file(file_id = file_id, receiver = username_employee, receiver_designation = designation_employee,remarks = "Forwared", file_extra_JSON = "None")
+            print("done",track_id)
+            messages.success(request, "File forwarded successfully")
+        else:
+            track_id = forward_file(file_id = file_id, receiver = from_user, receiver_designation = from_designation, remarks = "Rejected", file_extra_JSON = "None")
+            print("done2")
+            messages.success(request, "File rejected successfully")
+
+        
+        return HttpResponse("Success")
+    else:
+        # Handle other HTTP methods if needed
+        return HttpResponse("Failure")
 
 def view_ltc_form(request, id):
     ltc_request = get_object_or_404(LTCform, id=id)
@@ -882,6 +1033,7 @@ def form_mangement_ltc(request):
         print(ltc_requests[0].name)
 
         return render(request, 'hr2Module/ltc_form.html',context)
+    
 
 def form_mangement_ltc_hr(request,id):
     print("Request of forward!")

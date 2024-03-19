@@ -48,6 +48,7 @@ class Constants:
     )
 
 
+
 # Employee model
 class Employee(models.Model):
     """
@@ -150,7 +151,7 @@ class LTCform(models.Model):
     pf_no = models.IntegerField(null=True)
     basic_pay_salary = models.IntegerField(null=True)
     designation = models.CharField(max_length=50, null=True)
-    department_info = models.CharField(max_length=20, null=True)
+    department_info = models.CharField(max_length=50, null=True)
     leave_availability = models.BooleanField(default=False)
     leave_start_date = models.DateField(null=True, blank=True)
     leave_end_date = models.DateField(null=True, blank=True)
@@ -167,6 +168,6 @@ class LTCform(models.Model):
     amount_of_advance_required = models.IntegerField(null=True, blank=True)
     certified_family_dependents = models.TextField(null=True)
     certified_advance = models.IntegerField(null=True)
-    adjusted_month = models.CharField(max_length=20, null=True)
+    adjusted_month = models.CharField(max_length=50, null=True)
     date = models.DateField(null=True)
     phone_number_for_contact = models.BigIntegerField(null=True)

@@ -272,11 +272,31 @@
                         <label for="phone_number_for_contact">Phone Number for contact</label>
                         <input type="number" name="phone_number_for_contact" maxlength="40" id="id_phone_number_for_contact">
                     </div>
-                    <!-- <div class="eight wide field">
-                        <label for="sign_faculty">Signature</label>
-                        <input type="image" name="sign_faculty" maxlength="40" id="id_sign_faculty">
-                    </div> -->
                 </div>
+
+
+                <div class="two fields">
+                    <div class="eight wide field">
+                        <label for="username_employee">Username:</label>
+                        <input type="text" name="username_employee" id="username_employee" class="ui search" placeholder="Enter Username">
+                    </div>
+                    <div class="eight wide field">
+                        <label for="designation_employee">Designation:</label>
+                        <input type="text" name="designation_employee" id="designation_employee" readonly>
+                    </div>
+                    <div class="field">
+                        <button id="check_button" class="ui primary button right floated">Check</button>
+                    </div>
+                </div>
+
+                <!-- <div class="one fields">
+                    <div class="field">
+                        <label for="file_attachment">File Attachment:</label>
+                        <input type="file" id="file_attachment" name="file_attachment">
+                    </div>
+                </div> -->
+                
+                
                 
 
                 <!-- <div class="eight wide field">
@@ -319,3 +339,35 @@
     <br>
     <div class="extra content"></div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#check_button').click(function(event) {
+            event.preventDefault();
+            var selectedUsername = $('#username_employee').val();
+
+            // Fire query to the URL with selected username
+            $.ajax({
+                url: '/hr2/search_employee/',
+                type: 'GET',
+                data: { search: selectedUsername }, // Pass search text as query parameter
+                success: function(data) {
+                    if (data.designation) {
+                        // Employee exists, update designation
+                        $('#designation_employee').val(data.designation);
+                        alert("Employee exists");
+                    } else {
+                        // Employee doesn't exist, show error message
+                        alert("Employee doesn't exist");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    // Show error message
+                    alert("An error occurred while processing your request.");
+                }
+            });
+        });
+    });
+</script>

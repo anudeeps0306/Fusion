@@ -28,45 +28,65 @@ Module
         <div class="ui large fluid raised card" style="max-width: 320px;">
 
             <div class="image">
-                <img src="{% static 'globals/img/zlatan.jpg' %}">
-            </div>
+                {% block usercard %}
+                {% include 'globals/usercard.html' %}
+                {% endblock %}
 
-            <div class="content">
-                {% comment %}
-                TODO: Add a If-Else here!
-                {% endcomment %}
-                {% if employee %}
-                <div class="ui large header" href="">
-                    {{ employee.user.first_name}}
-                    {{ employee.user.last_name}}
-                    <span class="right floated meta">
-                        {{ employee.department.name}}
-                    </span>
-                </div>
-                {% else %}
-                <div class="ui large header" href="">
-                    {{ request.user.first_name}}
-                    {{ request.user.last_name}}
-                    <span class="right floated meta">
-                        {{ request.user.extrainfo.department.name}}
-                    </span>
-                </div>
-                {% endif %}
+                <!-- <div class="ui divider"></div> -->
+                    <!-- <div class="content"> -->
+                        {% comment %}
+                        TODO: Add a If-Else here!
+                        {% endcomment %}
+                        <!-- {% if employee %}
+                        <div class="ui large header" href="">
+                            {{ employee.user.first_name}}
+                            {{ employee.user.last_name}}
 
-                <div class="meta">
-                    {% for i in Curr_desig %}
-                    <span> {% comment %}Should this be inside if else?{% endcomment %}
-                        {% if i == "co-ordinator" or i == "co co-ordinator" %}
-                        {{ i }} of {{ club_details }} club
+                            <span class="right floated meta">
+                                {{ employee.department.name}}
+                            </span>
+                        </div>
                         {% else %}
-                        {{ i }}
-                        {% endif %}
-                    </span>
-                    <br>
-                    {% endfor %}
+                        <div class="ui large header" href="">
+                            {{ request.user.first_name}}
+                            {{ request.user.last_name}}
+                            <span class="right floated meta">
+                                {{ request.user.extrainfo.department.name}}
+                            </span>
+                        </div>
+                        {% endif %} -->
+
+                        <!-- <div class="meta">
+                            {% for i in Curr_desig %}
+                            <span> {% comment %}Should this be inside if else?{% endcomment %}
+                                {% if i == "co-ordinator" or i == "co co-ordinator" %}
+                                {{ i }} of {{ club_details }} club
+                                {% else %}
+                                {{ i }}
+                                {% endif %}
+                            </span>
+                            <br>
+                            {% endfor %}
+                        </div> -->
+                    <!-- </div> -->
                 </div>
+
+            
+                <!-- <div class="ui huge fluid vertical pointing menu" style="max-width: 320px;">
+                    <a class="item" href="http://127.0.0.1:8000/hr2/cpda_form/{{ user_id }}">
+                        CPDA
+                        <i class="right floated chevron right icon"></i>
+                    </a>
+                    <a class="item" href="http://127.0.0.1:8000/hr2/ltc_form/{{ user_id }}">
+                        LTC
+                        <i class="right floated chevron right icon"></i>
+                    </a>
+                </div> -->
             </div>
-        </div>
+
+
+
+
 
 
 
@@ -244,20 +264,15 @@ Module
                 <div class="twenty wide field">
                     <label for="details_of_family_members_already_done">(i) Details of family members for whom L.T.C. for this block has already been availed:</label>
                     <div class="three fields">
+                        {% for member in ltc_request.details_of_family_members_already_done %}
                         <div class="eight wide field">
-                            <label for="family_mem_a">a</label>
-                            <input type="text" name="details_of_family_members_already_done" maxlength="40" id="id_family_mem_a" value="{{ details_of_family_members_already_done }}" readonly>
+                            <label for="family_mem_{{ forloop.counter }}">{{ forloop.counter }}</label>
+                            <input type="text" name="details_of_family_members_already_done[]" maxlength="40" id="id_family_mem_{{ forloop.counter }}" value="{{ member }}" readonly>
                         </div>
-                        <div class="eight wide field">
-                            <label for="family_mem_b">b</label>
-                            <input type="text" name="details_of_family_members_already_done" maxlength="40" id="id_family_mem_b" value="{{ details_of_family_members_already_done }}" readonly>
-                        </div>
-                        <div class="eight wide field">
-                            <label for="family_mem_c">c</label>
-                            <input type="text" name="details_of_family_members_already_done" maxlength="40" id="id_family_mem_c" value="{{ details_of_family_members_already_done }}" readonly>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
+                
 
                 <div class="eight wide field">
                     <label for="family_members_about_to_avail">(ii) Details of family members who will avail L.T.C. <br> &nbsp; &nbsp; &nbsp; &nbsp; (a) Self &nbsp; (b) Spouse &nbsp;(c) Children</label>
@@ -319,38 +334,38 @@ Module
                         <tr>
                             <td><input type="number" name="d_info_1_1" maxlength="40" id="id_d_info_1_1"  value="{{ ltc_request.d_info_1_1 }}"></td>
                             <td><input type="text" name="d_info_1_2" maxlength="40" id="id_d_info_1_2"  value="{{ ltc_request.d_info_1_2 }}"></td>
-                            <td><input type="number" name="d_info_1_3" maxlength="40" id="id_d_info_1_3"  value="{{ ltc_request.d_info_1_3 }"}></td>
-                            <td><input type="text" name="d_info_1_4" maxlength="40" id="id_d_info_1_4"  value="{{ ltc_request.d_info_1_4 }"}></td>
+                            <td><input type="number" name="d_info_1_3" maxlength="40" id="id_d_info_1_3"  value="{{ ltc_request.d_info_1_3 }}"></td>
+                            <td><input type="text" name="d_info_1_4" maxlength="40" id="id_d_info_1_4"  value="{{ ltc_request.d_info_1_4 }}"></td>
                         </tr>
                         <tr>
-                            <td><input type="number" name="d_info_2_1" maxlength="40" id="id_d_info_2_1"  value="{{ ltc_request.info_6_1 }}></td>
-                            <td><input type="text" name="d_info_2_2" maxlength="40" id="id_d_info_2_2"  value="{{ ltc_request.info_6_1 }}></td>
-                            <td><input type="number" name="d_info_2_3" maxlength="40" id="id_d_info_2_3"></td>
-                            <td><input type="text" name="d_info_2_4" maxlength="40" id="id_d_info_2_4"></td>
+                            <td><input type="number" name="d_info_2_1" maxlength="40" id="id_d_info_2_1"  value="{{ ltc_request.d_info_2_1 }}"></td>
+                            <td><input type="text" name="d_info_2_2" maxlength="40" id="id_d_info_2_2"  value="{{ ltc_request.d_info_2_2 }}"></td>
+                            <td><input type="number" name="d_info_2_3" maxlength="40" id="id_d_info_2_3" value="{{ ltc_request.d_info_2_3 }}"></td>
+                            <td><input type="text" name="d_info_2_4" maxlength="40" id="id_d_info_2_4" value="{{ ltc_request.d_info_2_4 }}"></td>
                         </tr>
                         <tr>
-                            <td><input type="number" name="d_info_3_1" maxlength="40" id="id_d_info_3_1"></td>
-                            <td><input type="text" name="d_info_3_2" maxlength="40" id="id_d_info_3_2"></td>
-                            <td><input type="number" name="d_info_3_3" maxlength="40" id="id_d_info_3_3"></td>
-                            <td><input type="text" name="d_info_3_4" maxlength="40" id="id_d_info_3_4"></td>
+                            <td><input type="number" name="d_info_3_1" maxlength="40" id="id_d_info_3_1" value="{{ ltc_request.d_info_3_1 }}"></td>
+                            <td><input type="text" name="d_info_3_2" maxlength="40" id="id_d_info_3_2" value="{{ ltc_request.d_info_3_2 }}"></td>
+                            <td><input type="number" name="d_info_3_3" maxlength="40" id="id_d_info_3_3" value="{{ ltc_request.d_info_3_3 }}"></td>
+                            <td><input type="text" name="d_info_3_4" maxlength="40" id="id_d_info_3_4" value="{{ ltc_request.d_info_3_4 }}"></td>
                         </tr>
                         <tr>
-                            <td><input type="number" name="d_info_4_1" maxlength="40" id="id_d_info_4_1"></td>
-                            <td><input type="text" name="d_info_4_2" maxlength="40" id="id_d_info_4_2"></td>
-                            <td><input type="number" name="d_info_4_3" maxlength="40" id="id_d_info_4_3"></td>
-                            <td><input type="text" name="d_info_4_4" maxlength="40" id="id_d_info_4_4"></td>
+                            <td><input type="number" name="d_info_4_1" maxlength="40" id="id_d_info_4_1" value="{{ ltc_request.d_info_4_1 }}"></td>
+                            <td><input type="text" name="d_info_4_2" maxlength="40" id="id_d_info_4_2" value="{{ ltc_request.d_info_4_2 }}"></td>
+                            <td><input type="number" name="d_info_4_3" maxlength="40" id="id_d_info_4_3" value="{{ ltc_request.d_info_4_3 }}"></td>
+                            <td><input type="text" name="d_info_4_4" maxlength="40" id="id_d_info_4_4" value="{{ ltc_request.d_info_4_4 }}"></td>
                         </tr>
                         <tr>
-                            <td><input type="number" name="d_info_5_1" maxlength="40" id="id_d_info_5_1"></td>
-                            <td><input type="text" name="d_info_5_2" maxlength="40" id="id_d_info_5_2"></td>
-                            <td><input type="number" name="d_info_5_3" maxlength="40" id="id_d_info_5_3"></td>
-                            <td><input type="text" name="d_info_5_4" maxlength="40" id="id_d_info_5_4"></td>
+                            <td><input type="number" name="d_info_5_1" maxlength="40" id="id_d_info_5_1" value="{{ ltc_request.d_info_5_1 }}"></td>
+                            <td><input type="text" name="d_info_5_2" maxlength="40" id="id_d_info_5_2" value="{{ ltc_request.d_info_5_2 }}"></td>
+                            <td><input type="number" name="d_info_5_3" maxlength="40" id="id_d_info_5_3" value="{{ ltc_request.d_info_5_3 }}"></td>
+                            <td><input type="text" name="d_info_5_4" maxlength="40" id="id_d_info_5_4" value="{{ ltc_request.d_info_5_4 }}"></td>
                         </tr>
                         <tr>
-                            <td><input type="number" name="d_info_6_1" maxlength="40" id="id_d_info_6_1"></td>
-                            <td><input type="text" name="d_info_6_2" maxlength="40" id="id_d_info_6_2"></td>
-                            <td><input type="number" name="d_info_6_3" maxlength="40" id="id_d_info_6_3"></td>
-                            <td><input type="text" name="d_info_6_4" maxlength="40" id="id_d_info_6_4"></td>
+                            <td><input type="number" name="d_info_6_1" maxlength="40" id="id_d_info_6_1" value="{{ ltc_request.d_info_6_1 }}"></td>
+                            <td><input type="text" name="d_info_6_2" maxlength="40" id="id_d_info_6_2" value="{{ ltc_request.d_info_6_2 }}"></td>
+                            <td><input type="number" name="d_info_6_3" maxlength="40" id="id_d_info_6_3" value="{{ ltc_request.d_info_6_3 }}"></td>
+                            <td><input type="text" name="d_info_6_4" maxlength="40" id="id_d_info_6_4" value="{{ ltc_request.d_info_6_4 }}"></td>
                         </tr>
                     </table>
                     
@@ -358,32 +373,32 @@ Module
 
                 <div class="eight wide field">
                     <label for="amount_of_advance_required">Amount of advance required, if any:</label>
-                    <input type="number" name="amount_of_advance_required" maxlength="10" id="id_advance_amount" value="{{ amount_of_advance_required}}" readonly>
+                    <input type="number" name="amount_of_advance_required" maxlength="10" id="id_advance_amount" value="{{ ltc_request.amount_of_advance_required}}" readonly>
                 </div>
                 <div class="two fields">
                 <div class="eight wide field">
                     <label for="certified_family_dependents">(i) Certified that family members for whom the L.T.C. is claimed are residing with me and are wholly dependent upon me. </label>
-                    <input type="text" name="certified_family_dependents" maxlength="40" id="id_certified_family_dependents" value="{{ certified_family_dependents}}" readonly>
+                    <input type="text" name="certified_family_dependents" maxlength="40" id="id_certified_family_dependents" value="{{ ltc_request.certified_family_dependents}}" readonly>
                 </div>
                 
                 <div class="eight wide field">
                     <label for="certified_advance">(ii) Certified that the previous L.T.C. advance drawn by me on </label>
-                    <input  name="certified_advance"  id="id_certified_advance_1" value="{{ certified_advance}}">
+                    <input  name="certified_advance"  id="id_certified_advance_1" value="{{ ltc_request.certified_advance}}">
                     <label for="adjusted_month">has been adjusted in the month of  </label>
-                    <input type="text" name="adjusted_month" maxlength="40" id="id_adjusted_month" value="{{ adjusted_month}}" readonly>
+                    <input type="text" name="adjusted_month" maxlength="40" id="id_adjusted_month" value="{{ ltc_request.adjusted_month}}" readonly>
 
                 </div>
                 </div>
 
                 <div class="eight wide field">
                     <label for="date">Date</label>
-                    <input type="date" name="date" id="id_date" value="{{ date|date:'Y-m-d'}}" readonly>
+                    <input type="date" name="date" id="id_date" value="{{ ltc_request.date|date:'Y-m-d'}}" readonly>
                 </div>
 
                 <div class="two fields">
                     <div class="eight wide field">
                         <label for="phone_number_for_contact">Phone Number for contact</label>
-                        <input type="number" name="phone_number_for_contact" maxlength="40" id="id_phone_number_for_contact" value="{{ phone_number_for_contact}}" readonly>
+                        <input type="number" name="phone_number_for_contact" maxlength="40" id="id_phone_number_for_contact" value="{{ ltc_request.phone_number_for_contact}}" readonly>
                     </div>
                     <!-- <div class="eight wide field">
                         <label for="sign_faculty">Signature</label>
@@ -413,12 +428,32 @@ Module
                     <label for="sign_director_registrar">Director/Registrar Signature</label>
                     <input type="image" name="sign_director_registrar" maxlength="40" id="id_sign_director_registrar">
                 </div> -->
-                <div class="field">
-                    <button class="ui primary button right floated" type="submit" value="Submit" onclick="formatAndSubmit()">
-                        Submit
-                    </button>
-                </div>
+                {% if button == 1 %}
+                    <div class="two fields">
+                        <div class="eight wide field">
+                            <label for="username_employee">Username:</label>
+                            <input type="text" name="username_employee" id="username_employee" class="ui search" placeholder="Enter Username">
+                        </div>
+                        <div class="eight wide field">
+                            <label for="designation_employee">Designation:</label>
+                            <input type="text" name="designation_employee" id="designation_employee" readonly>
+                        </div>
+                        <button id="check_button" class="ui primary button right floated">Check</button>
+                    </div>
+                    <div class="two fields">
+                        <button id="forward-btn" class="ui primary button right floated" type="submit" value="Forward">
+                            Forward
+                        </button>
+                        <button id="reject-btn" class="ui primary red button right floated" type="submit" value="Reject">
+                            Reject
+                        </button>
+                    </div>
+
+                {% endif %}
             </div>
+            <input type="hidden" id="file_id" name="file_id" value="{{ file_id }}">
+            <input type="hidden" id="from_user" name="from_user" value="{{ from_user }}">
+            <input type="hidden" id="from_designation" name="from_designation" value="{{ from_designation }}">
         </form>
 
 
@@ -497,6 +532,91 @@ Module
         $("#loader").addClass("disabled");
     }*/
 </script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#check_button').click(function(event) {
+            event.preventDefault();
+            var selectedUsername = $('#username_employee').val();
+
+            // Fire query to the URL with selected username
+            $.ajax({
+                url: '/hr2/search_employee/',
+                type: 'GET',
+                data: { search: selectedUsername }, // Pass search text as query parameter
+                success: function(data) {
+                    if (data.designation) {
+                        // Employee exists, update designation
+                        $('#designation_employee').val(data.designation);
+                        alert("Employee exists");
+                    } else {
+                        // Employee doesn't exist, show error message
+                        alert("Employee doesn't exist");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    // Show error message
+                    alert("An error occurred while processing your request.");
+                }
+            });
+        });
+
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+       
+        // Handle Forward and Reject button clicks
+        $('#forward-btn').click(function(event) {
+            event.preventDefault();
+            // Perform actions for forwarding
+            handleForwardOrReject(0);
+        });
+
+        $('#reject-btn').click(function(event) {
+            event.preventDefault();
+            // Perform actions for rejecting
+            handleForwardOrReject(1);
+        });
+
+        function handleForwardOrReject(action) {
+            // Prepare the data to be sent to the server
+            var formData = $('#ltc_form').serialize(); // Serialize the form data
+            formData += '&action=' + action; // Append the action (0 for Forward, 1 for Reject)
+            var file_id = $('#file_id').val();
+            var from_user = $('#from_user').val();
+            var from_designation = $('#from_designation').val();
+            formData += '&context=' + JSON.stringify({
+                file_id: file_id,
+                from_user: from_user,
+                from_designation: from_designation
+            });
+            // Fire an AJAX request to handle the action
+            $.ajax({
+                url: '/hr2/file_handle/',
+                type: 'POST',
+                data: formData, // Send the serialized form data
+                success: function(data) {
+                    // Handle success response, if needed
+                    alert("Request it succefull.");
+                    console.log(data);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    // Show error message, if needed
+                    alert("An error occurred while processing your request.");
+                }
+            });
+        }
+    });
+</script>
+
 
 {% endblock %}
 

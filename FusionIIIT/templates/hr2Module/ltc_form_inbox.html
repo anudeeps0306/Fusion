@@ -16,18 +16,22 @@
                                 <th><h4>Desgination</h4></th>
                                 <th><h4>Date</h4></th>
                                 <th><h4>View</h4></th>
+                                <th><h4>Track</h4></th>
                                 <!-- Add more headers for LTC request details -->
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Loop through LTC requests and display in table -->
-                            {% for ltc_request in ltc_requests %}
+                            {% for ltc_request in inbox %}
                                 <tr>
                                     <td>{{ ltc_request.id }}</td>
-                                    <td>{{ ltc_request.name }}</td>
-                                    <td>{{ ltc_request.designation }}</td>
-                                    <th>{{ ltc_request.date }}</th>
-                                    <td><a href="http://127.0.0.1:8000/hr2/view_ltc_form/{{ ltc_request.id }}">View</a></td>
+                                    <td>{{ ltc_request.sent_by_user }}</td>
+                                    <td>{{ ltc_request.sent_by_designation }}</td>
+                                    <td>{{ ltc_request.upload_date }}</td>
+                                    <td><a href="http://127.0.0.1:8000/hr2/form_view_ltc/{{ ltc_request.src_object_id }}?param1={{ ltc_request.sent_by_user }}&param2={{ ltc_request.sent_by_designation }}&param3={{ ltc_request.id }}">View</a></td>
+
+                                    <td><a href="http://127.0.0.1:8000/hr2/track_file/{{ ltc_request.id }}">Track</a></td>
+
                                 </tr>
                             {% empty %}
                                 <tr>
@@ -42,7 +46,8 @@
     </div>
 </div>
 
-<!-- JavaScript to handle button click -->
+
+
 <script>
     $(document).ready(function() {
         $('.forward-btn').on('click', function() {

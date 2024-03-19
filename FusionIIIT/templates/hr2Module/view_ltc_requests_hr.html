@@ -48,11 +48,11 @@
                 },
                 success: function(response) {
                     // Handle success response, if needed
-                    console.log(response);
+                    alret("User exists");
                 },
                 error: function(xhr, status, error) {
                     // Handle error
-                    console.error(error);
+                    alret("User doesn't exists");
                 }
             });
         });
