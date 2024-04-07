@@ -10,6 +10,7 @@ urlpatterns = [
     url('ltc/', form_views.LTC.as_view(), name = 'LTC_form'),
     url('formManagement/', form_views.FormManagement.as_view(), name = 'formManagement'),
     url('tracking/', form_views.TrackProgress.as_view(), name = 'tracking'),
+    url('formFetch/', form_views.FormFetch.as_view(), name = "fetch_form"),
     # url(r'^$', views.service_book, name='hr2'),
     # url(r'^hradmin/$', views.hr_admin, name='hradmin'),
     # url(r'^edit/(?P<id>\d+)/$', views.edit_employee_details,

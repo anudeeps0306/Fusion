@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import MultipleObjectsReturned
 from applications.filetracking.sdk.methods import *
 from applications.globals.models import Designation, HoldsDesignation
+# from django.contrib.auth.models import User
 
 class LTC(APIView):
     serializer_class = LTC_serializer
@@ -329,3 +330,29 @@ class TrackProgress(APIView):
         file_id = request.query_params.get("id")
         progress = view_history(file_id)
         return Response({"status":progress},status = status.HTTP_200_OK)
+    
+class FormFetch(APIView):
+    permission_classes = (AllowAny, )
+    def get(self, request, *args, **kwargs):
+        form_id = request.query_params.get("id")
+        form_type = request.query_params.get("type")
+        if form_type == "LTC":
+            forms = LTCform.objects.get(id =  form_id)           
+            serializer = LTC_serializer(forms, many = False)
+            form = serializer.data
+            print(form["created_by"])
+            user = User.objects.get(id = int(form["created_by"]))
+            print(type(user.username))
+        elif form_type == "CPDAReimbursement":
+            forms = CPDAReimbursementform.objects.get(id =  form_id)           
+            serializer = CPDAReimbursement_serializer(forms, many = False)
+        elif form_type == "CPDAAdvance":
+            forms = CPDAAdvanceform.objects.get(id =  form_id)           
+            serializer = CPDAAdvance_serializer(forms, many = False)
+        elif form_type == "Appraisal":
+            forms = Appraisalform.objects.get(id =  form_id)           
+            serializer = Appraisal_serializer(forms, many = False)
+        elif form_type == "Leave":
+            forms = Leaveform.objects.get(id =  form_id)           
+            serializer = Leave_serializer(forms, many = False)
+        return Response({"form" : serializer.data, "creator" : user.username}, status = status.HTTP_200_OK)
