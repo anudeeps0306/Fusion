@@ -136,7 +136,6 @@ def healthcare_center_notif(sender, recipient, type):
 
     notify.send(sender=sender, recipient=recipient, url=url, module=module, verb=verb)
 
-
 def file_tracking_notif(sender, recipient,title):
     url='filetracking:inward'
     module='File Tracking'
@@ -144,6 +143,13 @@ def file_tracking_notif(sender, recipient,title):
     recipient = recipient
     verb = title
 
+    notify.send(sender=sender, recipient=recipient, url=url, module=module, verb=verb)
+def prog_and_curr_notif(sender, recipient,title):
+    url='programme_curriculum:inward_files'
+    module='Programme and Curriculum'
+    sender = sender
+    recipient = recipient
+    verb = title
     notify.send(sender=sender, recipient=recipient, url=url, module=module, verb=verb)
 
 def scholarship_portal_notif(sender, recipient, type):
@@ -175,7 +181,6 @@ def scholarship_portal_notif(sender, recipient, type):
     elif type == 'Reject_Silver':
         verb = "Your Convocation form for D&M Proficiency Gold Medal has been rejected "
     notify.send(sender=sender, recipient=recipient, url=url, module=module, verb=verb)
-
 
 
 
@@ -354,7 +359,7 @@ def department_notif(sender, recipient, type):
                 verb=verb,
                 flag=flag)
 def examination_notif(sender, recipient, type):
-    url='examination:examination'
+    url='examination:updateGrades'
     module='examination'
     sender = sender
     recipient = recipient
@@ -409,3 +414,11 @@ def research_procedures_notif(sender,recipient,type):
 
     notify.send(sender=sender,recipient=recipient,url=url,module=module,verb=verb)
 
+def course_management_notif(sender, recipient, type,  course, course_name, course_code, flag):
+    url = 'online_cms:course'
+    module="Course Management"
+    sender = sender
+    recipient = recipient
+    verb = type
+ 
+    notify.send(sender=sender, recipient=recipient, url=url, module=module, verb=verb, flag=flag, course_code=course_code, course=course, cname = course_name)
